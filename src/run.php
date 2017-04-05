@@ -9,11 +9,13 @@ if (!isset($arguments["data"])) {
 }
 
 try {
+    print "Preparing merged file for upload";
     $app = new \Keboola\SapiMergedExport\App();
     $app->run(
         $arguments["data"] . "/in/tables",
         $arguments["data"] . "/out/files"
     );
+    print "Preparation done";
 } catch (\Exception $e) {
     print $e->getMessage();
     exit(2);
