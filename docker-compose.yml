@@ -1,0 +1,10 @@
+version: '2'
+services:
+  sapi-merged-export:
+    build: .
+    image: keboola/docker-demo-app
+    tty: true
+    stdin_open: true
+    command: sh -c 'composer install && php vendor/bin/phpunit'
+    volumes:
+      - ./:/code
