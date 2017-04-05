@@ -1,6 +1,6 @@
 <?php
 
-namespace Keboola\DockerDemo;
+namespace Keboola\SapiMergedExport;
 
 use Keboola\SapiMergedExport\App;
 use PHPUnit\Framework\TestCase;
