@@ -8,28 +8,15 @@ if (!isset($arguments["data"])) {
     exit(1);
 }
 
-$config = json_decode(file_get_contents($arguments["data"] . "/config.json"), true);
-
-if (isset($config["storage"]["input"]["tables"][0]["destination"])) {
-    $sourceFile  = $config["storage"]["input"]["tables"][0]["destination"];
-} else {
-    $sourceFile = $config["storage"]["input"]["tables"][0]["source"];
-}
-$destinationFile = "sliced.csv";
-
 try {
-    $splitter = new \Keboola\DockerDemo\Splitter();
-    $rows = $splitter->processFile(
-        $arguments["data"] . "/in/tables/{$sourceFile }",
-        $arguments["data"] . "/out/tables/{$destinationFile}",
-        $config["parameters"]["primary_key_column"],
-        $config["parameters"]["data_column"],
-        $config["parameters"]["string_length"]
+    $app = new \Keboola\SapiMergedExport\App();
+    $app->run(
+        $arguments["data"] . "/in/tables",
+        $arguments["data"] . "/out/files"
     );
-} catch (\Keboola\DockerDemo\Splitter\Exception $e) {
+} catch (\Exception $e) {
     print $e->getMessage();
-    exit(1);
+    exit(2);
 }
 
-print "Processed {$rows} rows.";
 exit(0);

@@ -8,16 +8,21 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
-class AppTest extends TestCase
+class FunctionalTest extends TestCase
 {
 
-    public function testProcess()
+    public function testApp()
     {
         // create data dirs
         $fs = new Filesystem();
         $finder = new Finder();
-        $inputTablesDir = sys_get_temp_dir() . '/input';
-        $outputFilesDir = sys_get_temp_dir() . '/output';
+        $dataDir = sys_get_temp_dir() . '/test-data';
+        $fs->mkdir($dataDir);
+
+        $fs->mkdir($dataDir . '/in');
+        $fs->mkdir($dataDir . '/out');
+        $inputTablesDir = $dataDir. '/in/tables';
+        $outputFilesDir = $dataDir . '/out/files';
         $fs->mkdir([$inputTablesDir, $outputFilesDir]);
 
         // create test files
@@ -28,8 +33,11 @@ id,text,some_other_column
 EOF
         );
 
-        $app = new App();
-        $app->run($inputTablesDir, $outputFilesDir);
+        $process = new Process(
+            sprintf("php /code/src/run.php --data=%s", escapeshellarg($dataDir))
+        );
+        $process->mustRun();
+        $this->assertEquals(0, $process->getExitCode());
 
         $foundFiles = $finder->files()->in($outputFilesDir);
         $this->assertCount(1, $foundFiles);

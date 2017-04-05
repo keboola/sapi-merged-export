@@ -11,6 +11,7 @@ namespace Keboola\SapiMergedExport;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Process\Process;
 
 class App
 {
@@ -32,6 +33,11 @@ class App
 
     private function processFile(SplFileInfo $file, $outputFilesFolderPath)
     {
-        $this->fileSystem->copy($file->getRealPath(), $outputFilesFolderPath . '/' . $file->getBasename());
+        $outputPath = $outputFilesFolderPath . '/' . $file->getBasename();
+        $this->fileSystem->copy($file->getRealPath(), $outputPath);
+
+        $cmd = sprintf("gzip --fast %s", escapeshellarg($outputPath));
+        $process = new Process($cmd);
+        $process->mustRun();
     }
 }
