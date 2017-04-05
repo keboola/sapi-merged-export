@@ -8,3 +8,6 @@ services:
     command: sh -c 'composer install && php vendor/bin/phpunit'
     volumes:
       - ./:/code
+  tests-ci:
+    image: keboola/docker-demo-app
+    command: ./tests/run.sh

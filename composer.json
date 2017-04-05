@@ -1,14 +1,12 @@
 {
-    "name": "keboola/docker-demo-test",
+    "name": "keboola/sapi-merged-export",
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^7.0",
-        "symfony/yaml": "~2.6.3"
+        "php": "^7.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.4",
-        "codeclimate/php-test-reporter": "dev-master",
+        "phpunit/phpunit": "^6",
         "squizlabs/php_codesniffer": "^2.6"
     },
     "autoload": {
