@@ -28,7 +28,7 @@ class App
     {
         array_map(function (SplFileInfo $file) use ($outputFilesFolderPath) {
             $this->processFile($file, $outputFilesFolderPath);
-        }, iterator_to_array($this->finder->files()->in($inputTablesFolderPath)));
+        }, iterator_to_array($this->finder->files()->in($inputTablesFolderPath)->name('*.csv')));
     }
 
     private function processFile(SplFileInfo $file, $outputFilesFolderPath)

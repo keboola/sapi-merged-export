@@ -27,6 +27,7 @@ id,text,some_other_column
 2,"Long text Long text Long text","Something else"
 EOF
         );
+        $fs->dumpFile($inputTablesDir . '/in.c-main.test.manifest', 'something');
 
         $app = new App();
         $app->run($inputTablesDir, $outputFilesDir);
