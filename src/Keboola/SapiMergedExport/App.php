@@ -40,5 +40,12 @@ class App
         $cmd = sprintf("gzip --fast %s", escapeshellarg($outputPath));
         $process = new Process($cmd);
         $process->mustRun();
+
+        $this->fileSystem->dumpFile($outputPath . '.gz.manifest', json_encode([
+            'is_encrypted' => true,
+            'tags' => [
+                'storage-merged-export',
+            ],
+        ]));
     }
 }

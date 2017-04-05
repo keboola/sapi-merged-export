@@ -40,9 +40,10 @@ EOF
         $this->assertEquals(0, $process->getExitCode());
 
         $foundFiles = $finder->files()->in($outputFilesDir);
-        $this->assertCount(1, $foundFiles);
+        $this->assertCount(2, $foundFiles);
 
-        $filesIterator = $foundFiles->getIterator();
+        $gzFiles = $foundFiles->name('*.gz');
+        $filesIterator = $gzFiles->getIterator();
         $filesIterator->rewind();
         $this->assertEquals('in.c-main.test.csv.gz', $filesIterator->current()->getBasename());
 

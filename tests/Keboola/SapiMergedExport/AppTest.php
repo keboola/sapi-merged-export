@@ -33,9 +33,10 @@ EOF
         $app->run($inputTablesDir, $outputFilesDir);
 
         $foundFiles = $finder->files()->in($outputFilesDir);
-        $this->assertCount(1, $foundFiles);
+        $this->assertCount(2, $foundFiles);
 
-        $filesIterator = $foundFiles->getIterator();
+        $gzFiles = $foundFiles->name('*.gz');
+        $filesIterator = $gzFiles->getIterator();
         $filesIterator->rewind();
         $this->assertEquals('in.c-main.test.csv.gz', $filesIterator->current()->getBasename());
 
@@ -43,5 +44,12 @@ EOF
         $process = new Process(sprintf("gzip -d %s", escapeshellarg($filesIterator->current()->getRealPath())));
         $process->mustRun();
         $this->assertEquals(file_get_contents($inputTablesDir . '/in.c-main.test.csv'), file_get_contents($outputFilesDir . '/in.c-main.test.csv'));
+
+        // manifest
+        $manifestFiles = $foundFiles->name('*.manifest');
+        $filesIterator = $manifestFiles->getIterator();
+        $filesIterator->rewind();
+        $this->assertEquals('in.c-main.test.csv.gz.manifest', $filesIterator->current()->getBasename());
+        $this->assertNotEmpty(json_decode(file_get_contents($filesIterator->current()->getRealPath()))->tags);
     }
 }
