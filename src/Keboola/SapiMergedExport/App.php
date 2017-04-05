@@ -33,6 +33,7 @@ class App
 
     private function processFile(SplFileInfo $file, $outputFilesFolderPath)
     {
+        print sprintf("Processing file: %s\n", $file->getBasename());
         $outputPath = $outputFilesFolderPath . '/' . $file->getBasename();
         $this->fileSystem->copy($file->getRealPath(), $outputPath);
 
