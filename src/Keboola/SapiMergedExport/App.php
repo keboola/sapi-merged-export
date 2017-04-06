@@ -35,9 +35,12 @@ class App
     {
         print sprintf("Processing file: %s\n", $file->getBasename());
         $outputPath = $outputFilesFolderPath . '/' . $file->getBasename();
-        $this->fileSystem->copy($file->getRealPath(), $outputPath);
 
-        $cmd = sprintf("gzip --fast %s", escapeshellarg($outputPath));
+        $cmd = sprintf(
+            "gzip --fast < %s > %s",
+            escapeshellarg($file->getRealPath()),
+            escapeshellarg($outputPath . '.gz')
+        );
         $process = new Process($cmd);
         $process->mustRun();
 
