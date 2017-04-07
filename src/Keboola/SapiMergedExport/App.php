@@ -42,6 +42,7 @@ class App
             escapeshellarg($outputPath . '.gz')
         );
         $process = new Process($cmd);
+        $process->setTimeout(null);
         $process->mustRun();
 
         $this->fileSystem->dumpFile($outputPath . '.gz.manifest', json_encode([
