@@ -27,6 +27,7 @@ id,text,some_other_column
 2,"Long text Long text Long text","Something else"
 EOF
         );
+        $initialFileContent = file_get_contents($inputTablesDir . '/in.c-main.test.csv');
         $fs->dumpFile($inputTablesDir . '/in.c-main.test.manifest', 'something');
 
         $app = new App();
@@ -43,7 +44,7 @@ EOF
         // un-gzip and check content
         $process = new Process(sprintf("gzip -d %s", escapeshellarg($filesIterator->current()->getRealPath())));
         $process->mustRun();
-        $this->assertEquals(file_get_contents($inputTablesDir . '/in.c-main.test.csv'), file_get_contents($outputFilesDir . '/in.c-main.test.csv'));
+        $this->assertEquals($initialFileContent, file_get_contents($outputFilesDir . '/in.c-main.test.csv'));
 
         // manifest
         $manifestFiles = $foundFiles->name('*.manifest');

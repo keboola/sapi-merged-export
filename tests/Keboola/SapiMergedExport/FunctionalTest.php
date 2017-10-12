@@ -26,12 +26,8 @@ class FunctionalTest extends TestCase
         $fs->mkdir([$inputTablesDir, $outputFilesDir]);
 
         // create test files
-        $fs->dumpFile($inputTablesDir . '/in.c-main.test.csv', <<< EOF
-id,text,some_other_column
-1,"Short text","Whatever"
-2,"Long text Long text Long text","Something else"
-EOF
-        );
+        $numberOfRows = 10000000;
+        $this->generateLargeFile($fs, $inputTablesDir . '/in.c-main.test.csv', $numberOfRows);
 
         $process = new Process(
             sprintf("php /code/src/run.php --data=%s", escapeshellarg($dataDir))
@@ -50,6 +46,24 @@ EOF
         // un-gzip and check content
         $process = new Process(sprintf("gzip -d %s", escapeshellarg($filesIterator->current()->getRealPath())));
         $process->mustRun();
-        $this->assertEquals(file_get_contents($inputTablesDir . '/in.c-main.test.csv'), file_get_contents($outputFilesDir . '/in.c-main.test.csv'));
+
+        // lines count
+        $outputLinesCount = (int) (new Process(sprintf("wc -l %s", escapeshellarg($outputFilesDir . '/in.c-main.test.csv'))))
+            ->mustRun()
+            ->getOutput();
+
+        $this->assertEquals($numberOfRows + 1, $outputLinesCount);
+    }
+
+    private function generateLargeFile(Filesystem $fs, $filePath, $numberOfRows)
+    {
+        $fs->dumpFile($filePath, "id,text,some_other_column\n");
+
+        for ($i = 0; $i < $numberOfRows; $i++) {
+            $fs->appendToFile(
+                $filePath,
+                sprintf('"%s","%s","%s"', rand(), rand(), rand()) . "\n"
+            );
+        }
     }
 }

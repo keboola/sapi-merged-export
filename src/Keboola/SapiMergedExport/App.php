@@ -37,13 +37,13 @@ class App
         $outputPath = $outputFilesFolderPath . '/' . $file->getBasename();
 
         $cmd = sprintf(
-            "gzip --fast < %s > %s",
-            escapeshellarg($file->getRealPath()),
-            escapeshellarg($outputPath . '.gz')
+            "gzip --fast %s",
+            escapeshellarg($file->getRealPath())
         );
         $process = new Process($cmd);
         $process->setTimeout(null);
         $process->mustRun();
+        $this->fileSystem->rename($file->getRealPath() . '.gz', $outputPath . '.gz');
 
         $this->fileSystem->dumpFile($outputPath . '.gz.manifest', json_encode([
             'is_encrypted' => true,
