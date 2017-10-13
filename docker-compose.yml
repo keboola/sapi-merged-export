@@ -2,7 +2,7 @@ version: '2'
 services:
   dev:
     build: .
-    image: keboola/docker-demo-app
+    image: keboola/sapi-merged-export
     mem_limit: 64m
     tty: true
     stdin_open: true
