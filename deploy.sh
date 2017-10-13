@@ -1,8 +1,18 @@
 #!/bin/bash
+set -e
 
-docker pull quay.io/keboola/aws-cli
-eval $(docker run --rm -i -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY quay.io/keboola/aws-cli ecr get-login --region us-east-1)
-docker tag keboola/docker-demo-app:latest 147946154733.dkr.ecr.us-east-1.amazonaws.com/keboola/sapi-merged-export:$TRAVIS_TAG
-docker tag keboola/docker-demo-app:latest 147946154733.dkr.ecr.us-east-1.amazonaws.com/keboola/sapi-merged-export:latest
-docker push 147946154733.dkr.ecr.us-east-1.amazonaws.com/keboola/sapi-merged-export:$TRAVIS_TAG
-docker push 147946154733.dkr.ecr.us-east-1.amazonaws.com/keboola/sapi-merged-export:latest
+export REPOSITORY=`docker run --rm  \
+    -e KBC_DEVELOPERPORTAL_USERNAME -e KBC_DEVELOPERPORTAL_PASSWORD \
+    quay.io/keboola/developer-portal-cli-v2:latest ecr:get-repository ${KBC_DEVELOPERPORTAL_VENDOR} ${KBC_DEVELOPERPORTAL_APP}`
+docker tag ${KBC_APP_REPOSITORY}:latest ${REPOSITORY}:${TRAVIS_TAG}
+docker tag ${KBC_APP_REPOSITORY}:latest ${REPOSITORY}:latest
+eval $(docker run --rm \
+    -e KBC_DEVELOPERPORTAL_USERNAME -e KBC_DEVELOPERPORTAL_PASSWORD \
+    quay.io/keboola/developer-portal-cli-v2:latest ecr:get-login ${KBC_DEVELOPERPORTAL_VENDOR} ${KBC_DEVELOPERPORTAL_APP})
+docker push ${REPOSITORY}:${TRAVIS_TAG}
+docker push ${REPOSITORY}:latest
+
+# Deploy to KBC -> update the tag in Keboola Developer Portal
+docker run --rm -e KBC_DEVELOPERPORTAL_USERNAME -e KBC_DEVELOPERPORTAL_PASSWORD \
+    quay.io/keboola/developer-portal-cli-v2:latest update-app-repository ${KBC_DEVELOPERPORTAL_VENDOR} ${KBC_DEVELOPERPORTAL_APP} ${TRAVIS_TAG} \
+    ecr ${REPOSITORY}
