@@ -35,6 +35,7 @@ class App
     {
         print sprintf("Processing file: %s\n", $file->getBasename());
         $outputPath = $outputFilesFolderPath . '/' . $file->getBasename();
+        $compressedPathBase = $file->getRealPath();
 
         $cmd = sprintf(
             "gzip --fast %s",
@@ -43,7 +44,7 @@ class App
         $process = new Process($cmd);
         $process->setTimeout(null);
         $process->mustRun();
-        $this->fileSystem->rename($file->getRealPath() . '.gz', $outputPath . '.gz');
+        $this->fileSystem->rename($compressedPathBase . '.gz', $outputPath . '.gz');
 
         $this->fileSystem->dumpFile($outputPath . '.gz.manifest', json_encode([
             'is_encrypted' => true,
