@@ -27,3 +27,6 @@ Component expects tables list on input. Generated CSV is stored to Storage Files
 
 
 `docker-compose run --rm dev`
+## License
+
+MIT licensed, see [LICENSE](./LICENSE) file.
