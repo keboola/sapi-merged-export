@@ -1,8 +1,5 @@
 # Storage API Merged Export
 
-[![Build Status](https://travis-ci.org/keboola/sapi-merged-export.svg?branch=master)](https://travis-ci.org/keboola/sapi-merged-export)
-
-
 This component is used for table download/export in Storage UI. 
 It allows download exported files as one gzipped CSV. CSV exports are otherwise splitted into multiple files.
 

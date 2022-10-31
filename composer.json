@@ -1,5 +1,6 @@
 {
     "name": "keboola/sapi-merged-export",
+    "description": "",
     "license": "MIT",
     "type": "project",
     "require": {
@@ -16,5 +17,21 @@
         "psr-4": {
             "Keboola\\": "src/Keboola/"
         }
+    },
+    "scripts": {
+        "tests-phpunit": "phpunit --testsuite unit",
+        "tests": [
+            "@tests-phpunit"
+        ],
+        "phpcs": "phpcs --standard=psr2 -n --ignore=vendor --extensions=php .",
+        "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",
+        "build": [
+            "@phpcs",
+            "@tests"
+        ],
+        "ci": [
+            "@composer validate --no-check-all --strict",
+            "@build"
+        ]
     }
 }

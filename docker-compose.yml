@@ -1,14 +1,11 @@
 version: '2'
 services:
-  dev:
+  app: &app
     build: .
     image: keboola/sapi-merged-export
+
+  dev:
+    <<: *app
     mem_limit: 64m
-    tty: true
-    stdin_open: true
-    command: sh -c 'composer install && php vendor/bin/phpcs --standard=psr2 -n --ignore=vendor --extensions=php . && php vendor/bin/phpunit'
     volumes:
       - ./:/code
-  tests-ci:
-    image: keboola/sapi-merged-export
-    command: sh -c 'composer install && php vendor/bin/phpcs --standard=psr2 -n --ignore=vendor --extensions=php . && php vendor/bin/phpunit'
