@@ -2,8 +2,9 @@
 
 namespace Keboola\SapiMergedExport;
 
-use Keboola\SapiMergedExport\App;
+use Keboola\Component\JsonHelper;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\Test\TestLogger;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
@@ -16,8 +17,12 @@ class AppTest extends TestCase
         // create data dirs
         $fs = new Filesystem();
         $finder = new Finder();
-        $inputTablesDir = sys_get_temp_dir() . '/input';
-        $outputFilesDir = sys_get_temp_dir() . '/output';
+        $datadir = sys_get_temp_dir();
+        $fs->remove($datadir);
+        putenv('KBC_DATADIR=' . $datadir);
+        $inputTablesDir = $datadir . '/in/tables';
+        $outputFilesDir = $datadir . '/out/files';
+        JsonHelper::writeFile($datadir . '/config.json', []);
         $fs->mkdir([$inputTablesDir, $outputFilesDir]);
 
         // create test files
@@ -30,8 +35,8 @@ EOF
         $initialFileContent = file_get_contents($inputTablesDir . '/in.c-main.test.csv');
         $fs->dumpFile($inputTablesDir . '/in.c-main.test.manifest', 'something');
 
-        $app = new App();
-        $app->run($inputTablesDir, $outputFilesDir);
+        $app = new \Keboola\SapiMergedExport\App(new TestLogger());
+        $app->execute();
 
         $foundFiles = $finder->files()->in($outputFilesDir);
         $this->assertCount(2, $foundFiles);
@@ -42,7 +47,9 @@ EOF
         $this->assertEquals('in.c-main.test.csv.gz', $filesIterator->current()->getBasename());
 
         // un-gzip and check content
-        $process = new Process(sprintf("gzip -d %s", escapeshellarg($filesIterator->current()->getRealPath())));
+        $process = Process::fromShellCommandline(
+            sprintf("gzip -d %s", escapeshellarg($filesIterator->current()->getRealPath()))
+        );
         $process->mustRun();
         $this->assertEquals($initialFileContent, file_get_contents($outputFilesDir . '/in.c-main.test.csv'));
 

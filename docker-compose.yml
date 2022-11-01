@@ -9,3 +9,4 @@ services:
     mem_limit: 64m
     volumes:
       - ./:/code
+      - ./data/:/data

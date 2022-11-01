@@ -2,7 +2,7 @@
 
 namespace Keboola\SapiMergedExport;
 
-use Keboola\SapiMergedExport\App;
+use Keboola\Component\JsonHelper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -24,14 +24,16 @@ class FunctionalTest extends TestCase
         $inputTablesDir = $dataDir. '/in/tables';
         $outputFilesDir = $dataDir . '/out/files';
         $fs->mkdir([$inputTablesDir, $outputFilesDir]);
+        JsonHelper::writeFile($dataDir . '/config.json', []);
 
         // create test files
         $numberOfRows = 10000000;
         $this->generateLargeFile($fs, $inputTablesDir . '/in.c-main.test.csv', $numberOfRows);
 
-        $process = new Process(
-            sprintf("php /code/src/run.php --data=%s", escapeshellarg($dataDir))
-        );
+        $process = Process::fromShellCommandline('php /code/src/run.php');
+        $process->setEnv([
+            'KBC_DATADIR' => $dataDir,
+        ]);
         $process->mustRun();
         $this->assertEquals(0, $process->getExitCode());
 
@@ -44,11 +46,11 @@ class FunctionalTest extends TestCase
         $this->assertEquals('in.c-main.test.csv.gz', $filesIterator->current()->getBasename());
 
         // un-gzip and check content
-        $process = new Process(sprintf("gzip -d %s", escapeshellarg($filesIterator->current()->getRealPath())));
+        $process = Process::fromShellCommandline(sprintf("gzip -d %s", escapeshellarg($filesIterator->current()->getRealPath())));
         $process->mustRun();
 
         // lines count
-        $outputLinesCount = (int) (new Process(sprintf("wc -l %s", escapeshellarg($outputFilesDir . '/in.c-main.test.csv'))))
+        $outputLinesCount = (int) (Process::fromShellCommandline(sprintf("wc -l %s", escapeshellarg($outputFilesDir . '/in.c-main.test.csv'))))
             ->mustRun()
             ->getOutput();
 
