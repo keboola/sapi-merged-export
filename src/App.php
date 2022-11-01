@@ -30,7 +30,7 @@ class App extends BaseComponent
 
     private function processFiles(string $inputTablesFolderPath, string $outputFilesFolderPath): void
     {
-        $outputFileName = 'tables.tar.gz';
+        $outputFileName = 'output.tar.gz';
         $cmd = sprintf(
             'cd %s; tar -czf %s/%s *.csv',
             $inputTablesFolderPath,
