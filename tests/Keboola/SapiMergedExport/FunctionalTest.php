@@ -115,7 +115,8 @@ class FunctionalTest extends TestCase
             $process = Process::fromShellCommandline(
                 sprintf(
                     "wc -l %s",
-                    escapeshellarg($outputFilesDir . '/in.c-main.test' . $i . '.csv'))
+                    escapeshellarg($outputFilesDir . '/in.c-main.test' . $i . '.csv')
+                )
             );
             $outputLinesCount = (int) $process
                 ->mustRun()
