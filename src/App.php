@@ -21,7 +21,7 @@ class App extends BaseComponent
             $this->processFiles($inputTablesFolderPath, $outputFilesFolderPath);
         } else {
             $finder = new Finder();
-            $tables = iterator_to_array($finder->files()->in($inputTablesFolderPath)->name('*.csv'));
+            $tables = $finder->files()->in($inputTablesFolderPath)->name('*.csv');
             foreach ($tables as $table) {
                 $this->processFile($table, $outputFilesFolderPath);
             }
