@@ -1,22 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
+use Keboola\SapiMergedExport\App;
+
 require_once(dirname(__FILE__) . "/../vendor/autoload.php");
 
-$arguments = getopt("d::", array("data::"));
-if (!isset($arguments["data"])) {
-    print "Data folder not set.";
-    exit(1);
-}
+$logger = new Keboola\Component\Logger();
 
 try {
     print "Preparing merged file for upload";
-    $app = new \Keboola\SapiMergedExport\App();
-    $app->run(
-        $arguments["data"] . "/in/tables",
-        $arguments["data"] . "/out/files"
-    );
+    $app = new App($logger);
+    $app->execute();
     print "Preparation done";
-} catch (\Exception $e) {
+} catch (Exception $e) {
     print $e->getMessage();
     exit(2);
 }
