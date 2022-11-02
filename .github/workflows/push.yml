@@ -57,7 +57,6 @@ jobs:
           username: ${{ env.KBC_DEVELOPERPORTAL_USERNAME }}
           password: ${{ env.KBC_DEVELOPERPORTAL_PASSWORD }}
           tag: ${{ steps.tag.outputs.app_image_tag }}
-          push_latest: ${{ steps.tag.outputs.is_semantic_tag }}
           source_image: ${{ env.APP_IMAGE}}
 
   tests:
@@ -80,7 +79,6 @@ jobs:
           password: ${{ env.KBC_DEVELOPERPORTAL_PASSWORD }}
           tag: ${{ needs.build.outputs.app_image_tag }}
           target_image: ${{ env.APP_IMAGE}}
-          tag_as_latest: true
       -
         name: Run tests
         run: docker run ${{env.APP_IMAGE}} composer ci
