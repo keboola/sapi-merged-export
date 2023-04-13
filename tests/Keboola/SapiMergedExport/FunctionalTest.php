@@ -126,6 +126,60 @@ class FunctionalTest extends TestCase
         }
     }
 
+    public function testNonCompressFile(): void
+    {
+        // create data dirs
+        $fs = new Filesystem();
+        $finder = new Finder();
+        $dataDir = sys_get_temp_dir() . '/test-data2';
+        $fs->remove($dataDir);
+        $fs->mkdir($dataDir);
+
+        $fs->mkdir($dataDir . '/in');
+        $fs->mkdir($dataDir . '/out');
+        $inputTablesDir = $dataDir . '/in/tables';
+        $outputFilesDir = $dataDir . '/out/files';
+        $fs->mkdir([$inputTablesDir, $outputFilesDir]);
+        JsonHelper::writeFile($dataDir . '/config.json', [
+            'parameters' => [
+                'doCompression' => false,
+                'oneCompressFile' => false,
+            ],
+        ]);
+
+        // create test files
+        $numberOfRows = 100;
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->generateLargeFile($fs, $inputTablesDir . '/in.c-main.test' . $i . '.csv', $numberOfRows);
+        }
+
+        $process = Process::fromShellCommandline('php /code/src/run.php');
+        $process->setEnv([
+            'KBC_DATADIR' => $dataDir,
+        ]);
+        $process->mustRun();
+        $this->assertEquals(0, $process->getExitCode());
+
+        $foundFiles = $finder->files()->in($outputFilesDir);
+        $this->assertCount(10, $foundFiles);
+
+        for ($i = 0; $i < 5; $i++) {
+            // lines count
+            $process = Process::fromShellCommandline(
+                sprintf(
+                    "wc -l %s",
+                    escapeshellarg($outputFilesDir . '/in.c-main.test' . $i . '.csv')
+                )
+            );
+            $outputLinesCount = (int) $process
+                ->mustRun()
+                ->getOutput();
+
+            $this->assertEquals($numberOfRows + 1, $outputLinesCount);
+        }
+    }
+    
     private function generateLargeFile(Filesystem $fs, $filePath, $numberOfRows): void
     {
         $fs->dumpFile($filePath, "id,text,some_other_column\n");
