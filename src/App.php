@@ -62,17 +62,21 @@ class App extends BaseComponent
         $outputPath = $outputFilesFolderPath . '/' . $file->getBasename();
         $compressedPathBase = $file->getRealPath();
 
-        $cmd = sprintf(
-            "gzip --fast %s",
-            escapeshellarg($file->getRealPath())
-        );
-        $process = Process::fromShellCommandline($cmd);
-        $process->setTimeout(null);
-        $process->mustRun();
+        if ($this->getConfig()->doCompression()) {
+            $cmd = sprintf(
+                "gzip --fast %s",
+                escapeshellarg($file->getRealPath())
+            );
+            $process = Process::fromShellCommandline($cmd);
+            $process->setTimeout(null);
+            $process->mustRun();
+            $compressedPathBase .= '.gz';
+            $outputPath .= '.gz';
+        }
 
         $fileSystem = new Filesystem();
-        $fileSystem->rename($compressedPathBase . '.gz', $outputPath . '.gz');
-        $fileSystem->dumpFile($outputPath . '.gz.manifest', json_encode([
+        $fileSystem->rename($compressedPathBase, $outputPath);
+        $fileSystem->dumpFile($outputPath . '.manifest', json_encode([
             'is_encrypted' => true,
             'tags' => [
                 'storage-merged-export',

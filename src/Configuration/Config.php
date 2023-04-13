@@ -12,4 +12,9 @@ class Config extends BaseConfig
     {
         return $this->getValue(['parameters', 'oneCompressFile'], false);
     }
+
+    public function doCompression(): bool
+    {
+        return $this->getValue(['parameters', 'doCompression'], true);
+    }
 }

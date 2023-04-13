@@ -15,8 +15,15 @@ class ConfigDefinition extends BaseConfigDefinition
         // @formatter:off
         /** @noinspection NullPointerExceptionInspection */
         $parametersNode
+            ->validate()
+                ->ifTrue(function ($v) {
+                    return $v['oneCompressFile'] && !$v['doCompression'];
+                })
+                ->thenInvalid('Cannot use "oneCompressFile" without "doCompression".')
+            ->end()
             ->children()
                 ->booleanNode('oneCompressFile')->defaultFalse()->end()
+                ->booleanNode('doCompression')->defaultTrue()->end()
             ->end()
         ;
 
